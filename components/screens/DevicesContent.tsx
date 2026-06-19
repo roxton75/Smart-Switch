@@ -48,26 +48,6 @@ export default function DevicesContent() {
   const [controllerLoading, setControllerLoading] = useState(true);
   const [controllerOnline, setControllerOnline] = useState(false);
 
-  //Backup
-  // useEffect(() => {
-  //   const unsubscribe = subscribeToController((controller) => {
-  //     setTimeout(() => {
-  //       if (!controller?.lastSeen) {
-  //         setControllerOnline(false);
-  //         setControllerLoading(false);
-  //         return;
-  //       }
-
-  //       setLastSeen(new Date(controller.lastSeen));
-
-  //       setControllerOnline(true);
-
-  //       setControllerLoading(false);
-  //     }, 1500); // Delay for loading effect
-  //   });
-
-  //   return unsubscribe;
-  // }, []);
   useEffect(() => {
     const unsubscribe = subscribeToController((controller) => {
       setTimeout(() => {

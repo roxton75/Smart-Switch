@@ -72,7 +72,8 @@ export default function SmartToast({
         <Ionicons
           name={type === "error" ? "warning-outline" : "checkmark-circle"}
           size={22}
-          color="#FFFFFF"
+          color="#88B04B"
+          style={styles.icon}
         />
 
         <View style={styles.textContainer}>
@@ -119,6 +120,10 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  icon: {
+    marginLeft: 6,
+  },
+
   successToast: {
     backgroundColor: COLORS.card,
   },
@@ -133,14 +138,14 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: COLORS.primary,
+    color: COLORS.navy,
     fontWeight: "700",
     fontSize: 15,
   },
 
   message: {
-    color: COLORS.navy,
+    color: COLORS.inactive,
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 1,
   },
 });

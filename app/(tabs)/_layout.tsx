@@ -350,8 +350,6 @@ const styles = StyleSheet.create({
 
     backgroundColor: COLORS.background,
 
-    //borderRadius: 28,
-
     borderTopWidth: 0.5,
 
     elevation: 12,
