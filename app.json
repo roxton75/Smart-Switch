@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "smart-switch",
+    "name": "Smart Switch",
     "slug": "smart-switch",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-app.png",
     "scheme": "smartswitch",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,7 +19,9 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "usesCleartextTraffic": true,
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "output": "static",
@@ -30,13 +32,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#ffffff"
+          // "image": "./assets/images/splash-icon.png",
+          // "imageWidth": 200,
+          // "resizeMode": "contain",
+          // "dark": {
+          //   "backgroundColor": "#000000"
+          // }
         }
       ]
     ],

@@ -9,12 +9,19 @@ WebServer server(80);
 Preferences preferences;
 
 void handleSaveWiFi();
+void handleSaveControllerName();
 void handleStatus();
+
+const int STATUS_LED = 2;
+void saveControllerName(String name);
+void blinkStatusLED();
 
 // const char* ssid = "rudrx";
 // const char* password = "rudddyyy@123";
 String wifiSSID;
 String wifiPassword;
+
+String controllerName = "Main Controller";
 
 void saveWiFiCredentials(
     String ssid,
@@ -85,10 +92,55 @@ void handleSaveWiFi()
     ESP.restart();
 }
 
+void handleSaveControllerName()
+{
+
+    String body = server.arg("plain");
+
+    DynamicJsonDocument doc(256);
+
+    DeserializationError error =
+        deserializeJson(doc, body);
+
+    if (error)
+    {
+
+        server.send(
+            400,
+            "application/json",
+            "{\"success\":false}");
+
+        return;
+    }
+
+    String name =
+        doc["name"].as<String>();
+
+    if (name.length() == 0)
+    {
+
+        server.send(
+            400,
+            "application/json",
+            "{\"success\":false}");
+
+        return;
+    }
+
+    saveControllerName(name);
+
+    server.send(
+        200,
+        "application/json",
+        "{\"success\":true}");
+}
+
 bool setupMode = false;
 
 void startSetupMode()
 {
+
+    digitalWrite(STATUS_LED, LOW);
 
     setupMode = true;
 
@@ -123,6 +175,11 @@ void loadWiFiCredentials()
         preferences.getString(
             "password",
             "");
+
+    controllerName =
+        preferences.getString(
+            "controllerName",
+            "Main Controller");
 
     preferences.end();
 
@@ -175,6 +232,21 @@ String getCurrentTimestamp()
     return String(buffer);
 }
 
+void saveControllerName(
+    String name)
+{
+
+    preferences.begin("wifi", false);
+
+    preferences.putString(
+        "controllerName",
+        name);
+
+    preferences.end();
+
+    controllerName = name;
+}
+
 void updateControllerStatus()
 { // Firebase
 
@@ -190,11 +262,26 @@ void updateControllerStatus()
         "Content-Type",
         "application/json");
 
+    // String body =
+    // "{"
+    // "\"isOnline\":true,"
+    // "\"wifiConnected\":true,"
+    // "\"lastSeen\":" +
+    // String(time(nullptr) * 1000) +
+    // ","
+    // "\"ipAddress\":\"" +
+    // WiFi.localIP().toString() +
+    // "\""
+    // "}";
     String body =
         "{"
-        "\"isOnline\":true,"
-        "\"wifiConnected\":true,"
-        "\"lastSeen\":" +
+        "\"name\":\"" +
+        controllerName + "\","
+                         "\"isOnline\":true,"
+                         "\"wifiConnected\":true,"
+                         "\"wifiSSID\":\"" +
+        WiFi.SSID() + "\","
+                      "\"lastSeen\":" +
         String(time(nullptr) * 1000) +
         ","
         "\"ipAddress\":\"" +
@@ -271,6 +358,11 @@ void startWebServer()
         HTTP_POST,
         handleSaveWiFi);
 
+    server.on(
+        "/controller-name",
+        HTTP_POST,
+        handleSaveControllerName);
+
     server.begin();
 
     Serial.println("HTTP Server Started");
@@ -286,6 +378,9 @@ void setup()
     // preferences.end();
 
     Serial.begin(115200);
+
+    pinMode(STATUS_LED, OUTPUT);
+    digitalWrite(STATUS_LED, LOW);
 
     for (int i = 0; i < 8; i++)
     {
@@ -328,7 +423,10 @@ void setup()
         millis() - startAttemptTime < 15000)
     {
 
-        delay(500);
+        digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
+
+        delay(250);
+
         Serial.print(".");
     }
 
@@ -349,16 +447,24 @@ void setup()
     Serial.println();
     Serial.println("WiFi Connected");
 
-    updateRelayOnlineStatus(true);
+    digitalWrite(
+        STATUS_LED,
+        HIGH);
 
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP());
+    Serial.print("Connected SSID: ");
+    Serial.println(WiFi.SSID());
 
     configTime(
         0,
         0,
         "pool.ntp.org",
         "time.nist.gov");
+    updateControllerStatus();
+
+    updateRelayOnlineStatus(true);
+
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
 
     Serial.println("Time Synced");
 }
@@ -396,17 +502,45 @@ void handleStatus()
         json);
 }
 
+void blinkStatusLED()
+{
+
+    static unsigned long lastBlink = 0;
+    static bool ledState = false;
+
+    if (millis() - lastBlink >= 500)
+    {
+
+        ledState = !ledState;
+
+        digitalWrite(
+            STATUS_LED,
+            ledState);
+
+        lastBlink = millis();
+    }
+}
+
 void loop()
 {
+    if (!setupMode && WiFi.status() == WL_CONNECTED)
+    {
+        digitalWrite(STATUS_LED, HIGH);
+    }
     server.handleClient();
 
     if (setupMode)
     {
+        blinkStatusLED();
         delay(10);
         return;
     }
     if (WiFi.status() != WL_CONNECTED)
     {
+
+        digitalWrite(
+            STATUS_LED,
+            !digitalRead(STATUS_LED));
 
         Serial.println("WiFi Disconnected");
 
