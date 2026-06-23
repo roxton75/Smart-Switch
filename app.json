@@ -7,7 +7,6 @@
     "icon": "./assets/images/logo.png",
     "scheme": "smartswitch",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -18,9 +17,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "usesCleartextTraffic": true,
       "softwareKeyboardLayoutMode": "resize",
       "package": "com.rudrx75.smartswitch"
     },
