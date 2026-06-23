@@ -86,8 +86,9 @@ export default function DeviceCard({
 
     try {
       await toggleRelayState(relayId, previousState);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log(error);
+      // console.log(error);
 
       // rollback if write fails
       setDisplayState(previousState);

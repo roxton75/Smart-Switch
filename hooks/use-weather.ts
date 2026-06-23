@@ -47,8 +47,9 @@ export default function useWeather() {
       setTemperature(Math.round(data.current.temperature_2m).toString());
 
       setWeatherCode(data.current.weather_code);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log("Weather error:", error);
+      // console.log("Weather error:", error);
     }
   };
 

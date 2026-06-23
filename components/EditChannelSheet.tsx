@@ -101,8 +101,9 @@ export default function EditChannelSheet({
         setShowSuccess(false);
         onClose();
       }, 1500);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log(error);
+      // console.log(error);
 
       setSaving(false);
     }

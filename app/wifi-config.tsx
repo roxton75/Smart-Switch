@@ -159,8 +159,9 @@ export default function WifiSetupContent() {
           }
         }, 35000);
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log(error);
+      // console.log(error);
 
       setConnecting(false);
 

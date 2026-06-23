@@ -236,8 +236,9 @@ export default function SetupContent() {
           lastSeen: null,
         }));
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log(error);
+      // console.log(error);
 
       setModalType("error");
 
@@ -443,65 +444,7 @@ export default function SetupContent() {
             onConfigureRelay={handleConfigureRelay}
           />
         )}
-        {/* {controllerLoading ? (
-          <View style={styles.loaderCard}>
-            <Ionicons name="wifi" size={48} color={COLORS.primary} />
-
-            <Text style={styles.loaderTitle}>Loading Controller</Text>
-          </View>
-        ) : !controllerConfigured ? (
-          <View style={styles.emptyStateContainer}>
-            <Ionicons
-              name="hardware-chip-outline"
-              size={64}
-              color={COLORS.primary}
-            />
-
-            <Text style={styles.emptyStateTitle}>
-              Controller Not Configured
-            </Text>
-
-            <Text style={styles.emptyStateText}>
-              Connect your controller to WiFi and complete the setup process.
-            </Text>
-
-            <Pressable
-              style={styles.emptyStateButton}
-              onPress={() => router.push("/wifi-config")}
-            >
-              <Ionicons name="wifi-outline" size={18} color="#FFF" />
-
-              <Text style={styles.emptyStateButtonText}>Configure WiFi</Text>
-            </Pressable>
-          </View>
-        ) : !controllerOnline ? (
-          <View style={styles.emptyStateContainer}>
-            <Ionicons
-              name="cloud-offline-outline"
-              size={64}
-              color={COLORS.inactive}
-            />
-
-            <Text style={styles.emptyStateTitle}>Controller Offline</Text>
-
-            <Text style={styles.emptyStateText}>
-              Your controller is configured but currently unreachable.
-            </Text>
-          </View>
-        ) : channelsLoading ? (
-          <>
-            <ChannelCardSkeleton />
-            <ChannelCardSkeleton />
-            <ChannelCardSkeleton />
-            <ChannelCardSkeleton />
-          </>
-        ) : (
-          <ChannelList
-            relays={controllerData?.relays}
-            onEditRelay={handleEditRelay}
-            onConfigureRelay={handleConfigureRelay}
-          />
-        )} */}
+       
       </ScrollView>
 
       <SmartModal

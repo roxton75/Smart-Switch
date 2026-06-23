@@ -46,8 +46,9 @@ export default function ChannelCard({
       await removeRelay(relayId);
 
       setRemoving(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.log(error);
+      // console.log(error);
 
       setRemoving(false);
     }
