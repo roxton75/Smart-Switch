@@ -3,6 +3,7 @@ import { COLORS } from "@/constants/theme";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import useInternetStatus from "hooks/useInternetStatus";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
@@ -10,6 +11,7 @@ import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  useInternetStatus();
   const [loaded] = useFonts({
     "PlusJakarta-Bold": require("@/assets/fonts/PlusJakartaSans-Bold.ttf"),
 
