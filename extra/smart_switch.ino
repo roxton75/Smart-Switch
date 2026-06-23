@@ -16,8 +16,11 @@ const int STATUS_LED = 2;
 void saveControllerName(String name);
 void blinkStatusLED();
 
-// const char* ssid = "rudrx";
-// const char* password = "rudddyyy@123";
+void handleFactoryReset();
+
+void WiFiEvent(WiFiEvent_t event);
+void updateOnlineStatus(bool online);
+
 String wifiSSID;
 String wifiPassword;
 
@@ -185,9 +188,6 @@ void loadWiFiCredentials()
 
     Serial.println();
     Serial.println("WiFi Credentials Loaded");
-
-    Serial.print("SSID: ");
-    Serial.println(wifiSSID);
 }
 
 const int relayPins[8] = {
@@ -202,7 +202,7 @@ const int relayPins[8] = {
 };
 
 unsigned long lastHeartbeat = 0;
-const unsigned long HEARTBEAT_INTERVAL = 15000;
+const unsigned long HEARTBEAT_INTERVAL = 10000; // 15000 ideal
 
 String databaseURL =
     "https://smart-switch-1baf4-default-rtdb.asia-southeast1.firebasedatabase.app/";
@@ -247,6 +247,54 @@ void saveControllerName(
     controllerName = name;
 }
 
+void handleFactoryReset()
+{
+
+    Serial.println();
+    Serial.println("===== FACTORY RESET =====");
+
+    preferences.begin("wifi", false);
+
+    preferences.clear();
+
+    preferences.end();
+
+    Serial.println("Preferences Cleared");
+
+    HTTPClient http;
+
+    String url =
+        databaseURL +
+        "/controllers/controller_1.json";
+
+    http.begin(url);
+
+    http.addHeader(
+        "Content-Type",
+        "application/json");
+
+    String body =
+        "{"
+        "\"controllerConfigured\":false,"
+        "\"wifiConnected\":false,"
+        "\"wifiSSID\":\"\","
+        "\"isOnline\":false"
+        "}";
+
+    http.PATCH(body);
+
+    http.end();
+
+    server.send(
+        200,
+        "application/json",
+        "{\"success\":true}");
+
+    delay(2000);
+
+    ESP.restart();
+}
+
 void updateControllerStatus()
 { // Firebase
 
@@ -262,19 +310,9 @@ void updateControllerStatus()
         "Content-Type",
         "application/json");
 
-    // String body =
-    // "{"
-    // "\"isOnline\":true,"
-    // "\"wifiConnected\":true,"
-    // "\"lastSeen\":" +
-    // String(time(nullptr) * 1000) +
-    // ","
-    // "\"ipAddress\":\"" +
-    // WiFi.localIP().toString() +
-    // "\""
-    // "}";
     String body =
         "{"
+        "\"controllerConfigured\":true,"
         "\"name\":\"" +
         controllerName + "\","
                          "\"isOnline\":true,"
@@ -345,6 +383,68 @@ void updateRelayOnlineStatus(bool status)
     }
 }
 
+void updateOnlineStatus(bool online)
+{
+
+    HTTPClient http;
+
+    String url =
+        databaseURL +
+        "/controllers/controller_1.json";
+
+    http.begin(url);
+
+    http.addHeader(
+        "Content-Type",
+        "application/json");
+
+    String body =
+        "{"
+        "\"isOnline\":" +
+        String(online ? "true" : "false") +
+        "}";
+
+    int httpCode = http.PATCH(body);
+
+    Serial.print("Online Status Updated: ");
+    Serial.println(httpCode);
+
+    http.end();
+}
+
+void WiFiEvent(WiFiEvent_t event)
+{
+
+    switch (event)
+    {
+
+    case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+
+        Serial.println();
+        Serial.println("WiFi Lost");
+
+        updateOnlineStatus(false);
+
+        updateRelayOnlineStatus(false);
+
+        break;
+
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+
+        Serial.println();
+        Serial.println("WiFi Reconnected");
+
+        updateOnlineStatus(true);
+
+        // updateRelayOnlineStatus(true);
+
+        break;
+
+    default:
+        break;
+    }
+}
+
 void startWebServer()
 {
 
@@ -363,6 +463,11 @@ void startWebServer()
         HTTP_POST,
         handleSaveControllerName);
 
+    server.on(
+        "/factory-reset",
+        HTTP_POST,
+        handleFactoryReset);
+
     server.begin();
 
     Serial.println("HTTP Server Started");
@@ -370,12 +475,6 @@ void startWebServer()
 
 void setup()
 {
-
-    // Comment these 3 lines out for setting up on a New Wifi or Every Boot
-
-    // preferences.begin("wifi", false);
-    // preferences.clear();
-    // preferences.end();
 
     Serial.begin(115200);
 
@@ -406,6 +505,8 @@ void setup()
     else
     {
 
+        WiFi.onEvent(WiFiEvent);
+
         WiFi.begin(
             wifiSSID.c_str(),
             wifiPassword.c_str());
@@ -420,7 +521,8 @@ void setup()
 
     while (
         WiFi.status() != WL_CONNECTED &&
-        millis() - startAttemptTime < 15000)
+        millis() - startAttemptTime < 10000 // 15000
+    )
     {
 
         digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import { COLORS, RADIUS, SPACING } from "@/constants/theme";
-
+import { FONTS } from "constants/fonts";
 type StatusCardProps = {
   controllerName: string;
   isOnline: boolean;
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 24,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
@@ -75,14 +75,14 @@ const styles = StyleSheet.create({
 
   statusText: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
 
     color: COLORS.navy,
   },
 
   deviceText: {
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
 
     color: COLORS.navy,
   },

@@ -1,20 +1,23 @@
+import { FONTS } from "@/constants/fonts";
+import { COLORS, RADIUS, SPACING } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import ChannelList from "components/ChannelList";
+import EditChannelSheet from "components/EditChannelSheet";
+import SmartModal from "components/ui/SmartModal";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Image,
+  Keyboard,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { COLORS, RADIUS, SPACING } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import SmartModal from "components/ui/SmartModal";
-import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
 import { subscribeToController } from "services/controllerService";
+import ChannelCardSkeleton from "./ChannelCardSkeleton";
 
 export default function SetupContent() {
   const router = useRouter();
@@ -33,6 +36,9 @@ export default function SetupContent() {
 
   const [controllerLoading, setControllerLoading] = useState(true);
 
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  // const [channelsLoading, setChannelsLoading] = useState(true);
+
   const [controllerOnline, setControllerOnline] = useState(false);
 
   const [controllerData, setControllerData] = useState<any>(null);
@@ -45,26 +51,18 @@ export default function SetupContent() {
 
   const [lastSeen, setLastSeen] = useState<Date | null>(null);
 
-  // useEffect(() => {
-  //   const unsubscribe = subscribeToController((controller) => {
-  //     // console.log("FIREBASE:", controller);
+  const [showSheet, setShowSheet] = useState(false);
 
-  //     setControllerData(controller);
+  const [selectedRelay, setSelectedRelay] = useState<any>(null);
 
-  //     setControllerOnline(controller?.isOnline ?? false);
+  const [sheetMode, setSheetMode] = useState<"edit" | "configure">("edit");
 
-  //     setControllerLoading(false);
-  //   });
-
-  //   return unsubscribe;
-  // }, []);
   useEffect(() => {
     const unsubscribe = subscribeToController((controller) => {
       setControllerData(controller);
 
       if (!controller?.lastSeen) {
         setControllerOnline(false);
-        setControllerLoading(false);
         return;
       }
 
@@ -83,14 +81,14 @@ export default function SetupContent() {
 
     const diff = Date.now() - lastSeen.getTime();
 
-    setControllerOnline(diff < 20000);
+    setControllerOnline(diff < 20500);
 
     setControllerLoading(false);
 
     const interval = setInterval(() => {
       const diff = Date.now() - lastSeen.getTime();
 
-      setControllerOnline(diff < 20000);
+      setControllerOnline(diff < 20500);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -116,10 +114,13 @@ export default function SetupContent() {
   }, [controllerOnline, waitingForController]);
 
   useEffect(() => {
-    if (showModal && modalType === "success") {
-      const timer = setTimeout(() => {
-        setShowModal(false);
-      }, 2000);
+    if (showModal && (modalType === "success" || modalType === "error")) {
+      const timer = setTimeout(
+        () => {
+          setShowModal(false);
+        },
+        modalType === "error" ? 2000 : 2500,
+      );
 
       return () => clearTimeout(timer);
     }
@@ -152,6 +153,39 @@ export default function SetupContent() {
       return () => clearTimeout(timer);
     }
   }, [controllerConfigured, controllerOnline, showModal]);
+
+  useEffect(() => {
+    if (!controllerOnline && showSheet) {
+      setShowSheet(false);
+
+      setSelectedRelay(null);
+
+      Keyboard.dismiss();
+
+      setModalType("error");
+
+      setModalTitle("Controller Offline");
+
+      setModalMessage("Controller disconnected while editing device.");
+
+      setShowModal(true);
+    }
+  }, [controllerOnline, showSheet]);
+
+  //UI Skeleton
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSkeleton(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!showSkeleton) {
+      setControllerLoading(false);
+    }
+  }, [showSkeleton]);
 
   const routerImageSource = controllerOnline
     ? require("@/assets/images/router-on.png")
@@ -215,6 +249,33 @@ export default function SetupContent() {
     }
   };
 
+  const handleEditRelay = ({ relayId, relay }: any) => {
+    setSheetMode("edit");
+
+    setSelectedRelay({
+      relayId,
+      relay,
+    });
+
+    setShowSheet(true);
+  };
+
+  const handleConfigureRelay = ({ relayId }: any) => {
+    setSheetMode("configure");
+
+    setSelectedRelay({
+      relayId,
+      relay: {
+        name: "",
+        location: "",
+        type: "",
+        assigned: false,
+      },
+    });
+
+    setShowSheet(true);
+  };
+
   return (
     <SafeAreaView edges={["left", "right"]} style={styles.container}>
       <ScrollView
@@ -234,11 +295,9 @@ export default function SetupContent() {
             </Text>
           </View>
 
-          {/* {controllerOnline && controllerData?.controllerConfigured && ( */}
           {controllerOnline && controllerConfigured && (
             <Pressable
               style={styles.forgetButton}
-              // onPress={handleForgetController}
               onPress={() => setShowForgetModal(true)}
             >
               <Ionicons name="trash-outline" size={20} color="#88B04B" />
@@ -272,7 +331,7 @@ export default function SetupContent() {
               {controllerData?.totalRelays || 0} Channels
             </Text>
 
-            {controllerLoading ? (
+            {showSkeleton || controllerLoading ? (
               <View style={styles.loadingBadge}>
                 <Text style={styles.loadingBadgeText}>•••</Text>
               </View>
@@ -305,9 +364,7 @@ export default function SetupContent() {
               <Text style={styles.infoLabel}>Controller Name</Text>
 
               <Text style={styles.infoValue}>
-                {controllerOnline
-                  ? controllerData?.name || "Main Controller"
-                  : "Not Connected"}
+                {controllerOnline ? controllerData?.name : "Not Connected"}
               </Text>
             </View>
 
@@ -316,7 +373,7 @@ export default function SetupContent() {
 
               <Text style={styles.infoValue}>
                 {controllerOnline
-                  ? controllerData?.ipAddress || "192.168.1.2"
+                  ? controllerData?.ipAddress || "0.0.0.0"
                   : "Unavailable"}
               </Text>
             </View>
@@ -324,48 +381,47 @@ export default function SetupContent() {
         </View>
 
         {/* Channels UI List */}
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text style={styles.devicesTitle}>Channels</Text>
+            <Text style={styles.deviceSubheading}>
+              Manage your relay channels
+            </Text>
+          </View>
+        </View>
 
-        {controllerLoading ? null : !controllerConfigured ? (
-          waitingForController ? (
-            <View style={styles.loaderCard}>
-              <Ionicons name="wifi" size={48} color={COLORS.primary} />
+        {showSkeleton ? (
+          <>
+            <ChannelCardSkeleton />
+            <ChannelCardSkeleton />
+            <ChannelCardSkeleton />
+            <ChannelCardSkeleton />
+          </>
+        ) : !controllerConfigured ? (
+          <View style={styles.emptyStateContainer}>
+            <Ionicons
+              name="hardware-chip-outline"
+              size={64}
+              color={COLORS.primary}
+            />
 
-              <Text style={styles.loaderTitle}>Connecting Controller</Text>
+            <Text style={styles.emptyStateTitle}>
+              Controller Not Configured
+            </Text>
 
-              <Text style={styles.loaderText}>
-                This may take up to 20 seconds.
-              </Text>
-            </View>
-          ) : (
-            // Not Configured State
-            <View style={styles.emptyStateContainer}>
-              <Ionicons
-                name="hardware-chip-outline"
-                size={64}
-                color={COLORS.primary}
-              />
+            <Text style={styles.emptyStateText}>
+              Connect your controller to WiFi and complete the setup process.
+            </Text>
 
-              <Text style={styles.emptyStateTitle}>
-                Controller Not Configured
-              </Text>
+            <Pressable
+              style={styles.emptyStateButton}
+              onPress={() => router.push("/wifi-config")}
+            >
+              <Ionicons name="wifi-outline" size={18} color="#FFF" />
 
-              <Text style={styles.emptyStateText}>
-                Connect your controller to WiFi and complete the setup process
-                to start controlling your smart devices.
-              </Text>
-
-              <Pressable
-                style={styles.emptyStateButton}
-                onPress={() => {
-                  router.push("/wifi-config");
-                }}
-              >
-                <Ionicons name="wifi-outline" size={18} color="#FFFFFF" />
-
-                <Text style={styles.emptyStateButtonText}>Configure WiFi</Text>
-              </Pressable>
-            </View>
-          )
+              <Text style={styles.emptyStateButtonText}>Configure WiFi</Text>
+            </Pressable>
+          </View>
         ) : !controllerOnline ? (
           <View style={styles.emptyStateContainer}>
             <Ionicons
@@ -377,14 +433,77 @@ export default function SetupContent() {
             <Text style={styles.emptyStateTitle}>Controller Offline</Text>
 
             <Text style={styles.emptyStateText}>
-              Your controller is configured but currently unreachable. Check the
-              power supply and WiFi connection.
+              Your controller is configured but currently unreachable.
             </Text>
           </View>
-        ) : null}
+        ) : (
+          <ChannelList
+            relays={controllerData?.relays}
+            onEditRelay={handleEditRelay}
+            onConfigureRelay={handleConfigureRelay}
+          />
+        )}
+        {/* {controllerLoading ? (
+          <View style={styles.loaderCard}>
+            <Ionicons name="wifi" size={48} color={COLORS.primary} />
 
-        {/* CHANNEL LIST */}
+            <Text style={styles.loaderTitle}>Loading Controller</Text>
+          </View>
+        ) : !controllerConfigured ? (
+          <View style={styles.emptyStateContainer}>
+            <Ionicons
+              name="hardware-chip-outline"
+              size={64}
+              color={COLORS.primary}
+            />
+
+            <Text style={styles.emptyStateTitle}>
+              Controller Not Configured
+            </Text>
+
+            <Text style={styles.emptyStateText}>
+              Connect your controller to WiFi and complete the setup process.
+            </Text>
+
+            <Pressable
+              style={styles.emptyStateButton}
+              onPress={() => router.push("/wifi-config")}
+            >
+              <Ionicons name="wifi-outline" size={18} color="#FFF" />
+
+              <Text style={styles.emptyStateButtonText}>Configure WiFi</Text>
+            </Pressable>
+          </View>
+        ) : !controllerOnline ? (
+          <View style={styles.emptyStateContainer}>
+            <Ionicons
+              name="cloud-offline-outline"
+              size={64}
+              color={COLORS.inactive}
+            />
+
+            <Text style={styles.emptyStateTitle}>Controller Offline</Text>
+
+            <Text style={styles.emptyStateText}>
+              Your controller is configured but currently unreachable.
+            </Text>
+          </View>
+        ) : channelsLoading ? (
+          <>
+            <ChannelCardSkeleton />
+            <ChannelCardSkeleton />
+            <ChannelCardSkeleton />
+            <ChannelCardSkeleton />
+          </>
+        ) : (
+          <ChannelList
+            relays={controllerData?.relays}
+            onEditRelay={handleEditRelay}
+            onConfigureRelay={handleConfigureRelay}
+          />
+        )} */}
       </ScrollView>
+
       <SmartModal
         visible={showModal}
         type={modalType}
@@ -401,6 +520,14 @@ export default function SetupContent() {
         onConfirm={confirmForgetController}
         onCancel={() => setShowForgetModal(false)}
       />
+      <EditChannelSheet
+        visible={showSheet}
+        relayId={selectedRelay?.relayId}
+        relay={selectedRelay?.relay}
+        mode={sheetMode}
+        controllerOnline={controllerOnline}
+        onClose={() => setShowSheet(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -413,7 +540,7 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingTop: 14,
+    paddingTop: 10,
   },
 
   headerRow: {
@@ -428,7 +555,7 @@ const styles = StyleSheet.create({
 
   heading: {
     fontSize: 28,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
     color: COLORS.primary,
     // marginTop: SPACING.md,
   },
@@ -437,12 +564,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "100",
     color: COLORS.grey,
+    fontFamily: FONTS.semiBold,
     marginBottom: -4,
   },
 
   forgetButton: {
     flexDirection: "row",
-
+    fontFamily: FONTS.semiBold,
     alignItems: "center",
 
     gap: 4,
@@ -479,7 +607,7 @@ const styles = StyleSheet.create({
 
     fontSize: 14,
 
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
   },
 
   heroCard: {
@@ -532,7 +660,7 @@ const styles = StyleSheet.create({
     flex: 1,
 
     paddingLeft: SPACING.lg,
-    paddingTop: 16,
+    paddingTop: 10,
     paddingBottom: 24,
     justifyContent: "space-between",
   },
@@ -540,27 +668,27 @@ const styles = StyleSheet.create({
   controllerTitle: {
     fontSize: 24,
 
-    fontWeight: "800",
+    fontFamily: FONTS.headingExtra,
 
     color: COLORS.navy,
   },
 
   controllerSubtitle: {
     fontSize: 14,
-
-    color: COLORS.inactive,
+    fontFamily: FONTS.medium,
+    color: COLORS.grey,
 
     //marginTop: -4,
   },
 
   statusPill: {
     alignSelf: "flex-start",
-    marginTop: 8,
+    marginVertical: 6,
     flexDirection: "row",
     alignItems: "center",
-
+    // backgroundColor: "#d8d8d8a6",
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 2,
     borderWidth: 1.5,
     borderRadius: 999,
   },
@@ -576,8 +704,8 @@ const styles = StyleSheet.create({
   },
 
   statusDot: {
-    width: 5,
-    height: 5,
+    width: 6,
+    height: 6,
 
     borderRadius: 999,
 
@@ -592,23 +720,22 @@ const styles = StyleSheet.create({
 
   statusText: {
     fontSize: 15,
-    fontWeight: "600",
-
+    fontFamily: FONTS.semiBold,
+    paddingBottom: 1,
     color: COLORS.primary,
   },
 
   offlineText: {
     color: COLORS.inactive,
+    paddingBottom: 2,
   },
 
-  infoSection: {
-    marginTop: 8,
-  },
+  infoSection: {},
 
   infoLabel: {
     fontSize: 12,
 
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
 
     color: COLORS.inactive,
   },
@@ -616,7 +743,7 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 15,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
@@ -624,7 +751,7 @@ const styles = StyleSheet.create({
   wifiName: {
     fontSize: 28,
 
-    fontWeight: "800",
+    fontFamily: FONTS.headingExtra,
 
     color: COLORS.navy,
 
@@ -634,7 +761,7 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 14,
 
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
 
     color: "#9E9E9E",
 
@@ -644,16 +771,75 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 28,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
   },
 
   subtitle: {
     fontSize: 15,
-
+    fontFamily: FONTS.medium,
     color: COLORS.grey,
     marginBottom: SPACING.md,
+  },
+
+  devicesTitle: {
+    fontSize: 28,
+    fontFamily: FONTS.heading,
+
+    color: COLORS.navy,
+  },
+
+  deviceSubheading: {
+    fontSize: 16,
+    fontWeight: "100",
+    fontFamily: FONTS.semiBold,
+    color: COLORS.grey,
+
+    marginBottom: SPACING.md,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    justifyContent: "space-between",
+  },
+
+  addButton: {
+    width: 44,
+    height: 44,
+    fontFamily: FONTS.semiBold,
+    borderRadius: 999,
+
+    backgroundColor: COLORS.primary,
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    shadowColor: "#000",
+
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+
+    shadowOpacity: 0.05,
+
+    shadowRadius: 8,
+
+    elevation: 2,
+    marginBottom: SPACING.md,
+  },
+
+  addIcon: {
+    fontSize: 28,
+
+    color: "#FFFFFF",
+
+    fontWeight: "400",
+
+    marginTop: -2,
   },
 
   listContainer: {
@@ -714,7 +900,7 @@ const styles = StyleSheet.create({
   channelTitle: {
     fontSize: 17,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
@@ -722,7 +908,7 @@ const styles = StyleSheet.create({
   channelSubtitle: {
     fontSize: 13,
 
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
 
     color: "#9E9E9E",
 
@@ -761,8 +947,9 @@ const styles = StyleSheet.create({
 
   badgeText: {
     fontSize: 13,
+    paddingBottom: 2,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
   },
 
   formContainer: {
@@ -811,7 +998,7 @@ const styles = StyleSheet.create({
   },
   connectButton: {
     height: 54,
-
+    fontFamily: FONTS.semiBold,
     borderRadius: 14,
 
     backgroundColor: COLORS.primary,
@@ -824,7 +1011,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
 
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
   },
 
   header: {
@@ -868,7 +1055,7 @@ const styles = StyleSheet.create({
   },
 
   loadingBadge: {
-    marginTop: 8,
+    //marginTop: 8,
 
     height: 30,
 
@@ -892,7 +1079,7 @@ const styles = StyleSheet.create({
   loadingBadgeText: {
     fontSize: 15,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.inactive,
 
@@ -924,7 +1111,7 @@ const styles = StyleSheet.create({
 
   loaderTitle: {
     fontSize: 22,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -954,7 +1141,7 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -965,6 +1152,8 @@ const styles = StyleSheet.create({
 
   emptyStateText: {
     fontSize: 15,
+
+    fontFamily: FONTS.regular,
 
     textAlign: "center",
 
@@ -977,7 +1166,7 @@ const styles = StyleSheet.create({
 
   emptyStateButton: {
     flexDirection: "row",
-
+    fontFamily: FONTS.semiBold,
     alignItems: "center",
 
     gap: 8,
@@ -994,7 +1183,7 @@ const styles = StyleSheet.create({
   emptyStateButtonText: {
     color: "#FFFFFF",
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     fontSize: 15,
   },

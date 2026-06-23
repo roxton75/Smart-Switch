@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import {
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -11,6 +10,7 @@ import {
 } from "react-native";
 
 import SmartModal from "@/components/ui/SmartModal";
+import { FONTS } from "@/constants/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, RADIUS, SPACING } from "constants/theme";
 import { router } from "expo-router";
@@ -33,6 +33,12 @@ export default function WifiSetupContent() {
   const [lastSeen, setLastSeen] = useState<Date | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  const [errorTitle, setErrorTitle] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     const unsubscribe = subscribeToController((controller) => {
       setControllerData(controller);
@@ -54,7 +60,7 @@ export default function WifiSetupContent() {
 
       const diff = Date.now() - lastSeen.getTime();
 
-      setControllerOnline(diff < 20000);
+      setControllerOnline(diff < 20500);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -83,23 +89,41 @@ export default function WifiSetupContent() {
   }, []);
 
   const configureESP = async () => {
+    if (controllerData?.controllerConfigured) {
+      setErrorTitle("Already Configured");
+
+      setErrorMessage(
+        "This controller is already connected to a WiFi network.",
+      );
+
+      setShowErrorModal(true);
+
+      return;
+    }
     if (!wifiSSID.trim()) {
-      Alert.alert("WiFi Name Required", "Please enter your WiFi name.");
+      setErrorTitle("WiFi Name Required");
+
+      setErrorMessage("Please enter your WiFi network name.");
+
+      setShowErrorModal(true);
+
       return;
     }
 
     if (wifiPassword.length < 8) {
-      Alert.alert(
-        "Invalid Password",
-        "WiFi password must be at least 8 characters.",
-      );
+      setErrorTitle("Invalid Password");
+
+      setErrorMessage("WiFi password must be at least 8 characters.");
+
+      setShowErrorModal(true);
+
       return;
     }
 
     try {
       setConnecting(true);
 
-      const response = await fetch("http://192.168.4.1/wifi", {
+      const controllerRequest = fetch("http://192.168.4.1/wifi", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,6 +133,13 @@ export default function WifiSetupContent() {
           password: wifiPassword,
         }),
       });
+
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Controller unreachable")), 5000),
+      );
+
+      const response: any = await Promise.race([controllerRequest, timeout]);
+
       if (response.ok) {
         setWaitingForController(true);
         setConnecting(true);
@@ -118,17 +149,26 @@ export default function WifiSetupContent() {
             setConnecting(false);
             setWaitingForController(false);
 
-            Alert.alert(
-              "Connection Failed",
-              "Please check your WiFi name and password.",
+            setErrorTitle("Connection Failed");
+
+            setErrorMessage(
+              "Please connect your phone to SmartSwitch_Setup and try again.",
             );
+
+            setShowErrorModal(true);
           }
         }, 35000);
       }
     } catch (error) {
       console.log(error);
 
-      Alert.alert("Error", "Failed to communicate with controller.");
+      setConnecting(false);
+
+      setErrorTitle("Controller Not Found");
+
+      setErrorMessage("Your phone is not connected to SmartSwitch_Setup WiFi.");
+
+      setShowErrorModal(true);
     }
   };
 
@@ -352,6 +392,13 @@ export default function WifiSetupContent() {
         title="Connecting Controller"
         message="Please wait while the controller is connecting"
       />
+      <SmartModal
+        visible={showErrorModal}
+        type="error"
+        title={errorTitle}
+        message={errorMessage}
+        onClose={() => setShowErrorModal(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -381,7 +428,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: 42,
     height: 42,
-
     borderRadius: 12,
 
     backgroundColor: COLORS.card,
@@ -403,14 +449,14 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 26,
-    fontWeight: "800",
+    fontFamily: FONTS.headingExtra,
 
     color: COLORS.primary,
   },
 
   subtitle: {
     fontSize: 14,
-
+    fontFamily: FONTS.medium,
     color: COLORS.grey,
 
     marginTop: 2,
@@ -451,7 +497,7 @@ const styles = StyleSheet.create({
 
   cardTitle: {
     fontSize: 20,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -467,13 +513,14 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 24,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
     color: COLORS.navy,
   },
 
   sectionSubtitle: {
     fontSize: 15,
     color: COLORS.grey,
+    fontFamily: FONTS.medium,
     marginTop: 2,
   },
 
@@ -541,14 +588,14 @@ const styles = StyleSheet.create({
   stepNumber: {
     color: "#FFFFFF",
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
   },
 
   stepTitle: {
     flex: 1,
 
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
@@ -579,7 +626,7 @@ const styles = StyleSheet.create({
   instructionTitle: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -665,7 +712,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.buttonBorder,
     borderRadius: 14,
-
+    fontFamily: FONTS.semiBold,
     backgroundColor: COLORS.primary,
 
     justifyContent: "center",
@@ -688,7 +735,7 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 14,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
 
@@ -708,7 +755,7 @@ const styles = StyleSheet.create({
 
     fontSize: 16,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
   },
 
   infoStrip: {
@@ -742,7 +789,7 @@ const styles = StyleSheet.create({
   },
 
   infoStripBold: {
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.primary,
   },
@@ -769,7 +816,7 @@ const styles = StyleSheet.create({
 
     fontSize: 20,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
   },
@@ -814,7 +861,7 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 24,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -823,7 +870,7 @@ const styles = StyleSheet.create({
 
   successSubtitle: {
     textAlign: "center",
-
+    fontFamily: FONTS.medium,
     color: COLORS.grey,
 
     lineHeight: 22,
@@ -840,7 +887,7 @@ const styles = StyleSheet.create({
   successLabel: {
     fontSize: 12,
 
-    fontWeight: "600",
+    fontFamily: FONTS.semiBold,
 
     color: COLORS.inactive,
   },
@@ -848,7 +895,7 @@ const styles = StyleSheet.create({
   successValue: {
     fontSize: 16,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
 
@@ -857,7 +904,7 @@ const styles = StyleSheet.create({
 
   successButton: {
     width: "100%",
-
+    fontFamily: FONTS.semiBold,
     height: 56,
 
     borderRadius: 14,
@@ -879,6 +926,6 @@ const styles = StyleSheet.create({
 
     fontSize: 16,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
   },
 });

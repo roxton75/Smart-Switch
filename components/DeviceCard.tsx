@@ -11,6 +11,7 @@ import {
 import { COLORS } from "@/constants/theme";
 import { toggleRelayState } from "@/services/relayService";
 import { Ionicons } from "@expo/vector-icons";
+import { FONTS } from "constants/fonts";
 import { useEffect, useRef, useState } from "react";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -74,7 +75,6 @@ export default function DeviceCard({
     }
   };
 
-
   const handleToggle = async () => {
     if (loading) return;
 
@@ -97,7 +97,6 @@ export default function DeviceCard({
       }, 800);
     }
   };
-
 
   useEffect(() => {
     let animation: Animated.CompositeAnimation;
@@ -260,7 +259,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
@@ -295,7 +294,8 @@ const styles = StyleSheet.create({
 
   badgeText: {
     fontSize: 13,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
+    paddingBottom: 2,
   },
 
   loadingDots: {

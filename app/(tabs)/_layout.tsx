@@ -121,7 +121,7 @@ export default function TabsLayout() {
             fontWeight: "800",
 
             color: COLORS.navy,
-            marginLeft: 6,
+            marginLeft: 5,
             //marginBottom: 6,
           },
 
@@ -136,7 +136,32 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Home",
+            headerTitle: () => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <Ionicons
+                  name="home"
+                  size={30}
+                  color={COLORS.navy}
+                  style={styles.titleIcons}
+                />
+
+                <Text
+                  style={{
+                    fontSize: 33,
+                    fontWeight: "600",
+                    color: COLORS.navy,
+                  }}
+                >
+                  Home
+                </Text>
+              </View>
+            ),
             headerRight: () => (
               <View
                 style={{
@@ -201,7 +226,32 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="devices"
           options={{
-            title: "Devices",
+            headerTitle: () => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <Ionicons
+                  name="grid"
+                  size={30}
+                  color={COLORS.navy}
+                  style={styles.titleIcons}
+                />
+
+                <Text
+                  style={{
+                    fontSize: 33,
+                    fontWeight: "600",
+                    color: COLORS.navy,
+                  }}
+                >
+                  Devices
+                </Text>
+              </View>
+            ),
             headerRight: () => (
               <View
                 style={{
@@ -269,7 +319,32 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="setup"
           options={{
-            title: "Set Up",
+            headerTitle: () => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <Ionicons
+                  name="wifi"
+                  size={30}
+                  color={COLORS.navy}
+                  style={styles.titleIcons}
+                />
+
+                <Text
+                  style={{
+                    fontSize: 33,
+                    fontWeight: "600",
+                    color: COLORS.navy,
+                  }}
+                >
+                  Set Up
+                </Text>
+              </View>
+            ),
             headerRight: () => (
               <View
                 style={{
@@ -404,5 +479,8 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: "700",
+  },
+  titleIcons: {
+    marginVertical: 8,
   },
 });

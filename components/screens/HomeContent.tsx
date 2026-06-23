@@ -12,12 +12,12 @@ import {
   View,
 } from "react-native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
-//import { getAssignedDevices } from "@/services/relayService";
+import { FONTS } from "@/constants/fonts";
 import { subscribeToController } from "@/services/controllerService";
 import { subscribeToDevices } from "@/services/relayService";
 import { Device } from "@/types/device";
 import { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import DeviceCardSkeleton from "./DeviceCardSkeleton";
 
 export default function HomeScreen() {
@@ -46,9 +46,10 @@ export default function HomeScreen() {
     .toUpperCase();
 
   const [controllerOnline, setControllerOnline] = useState(false);
-
+  const [controllerData, setControllerData] = useState<any>(null);
   useEffect(() => {
     const unsubscribe = subscribeToController((controller) => {
+      setControllerData(controller);
       if (!controller?.lastSeen) {
         setControllerOnline(false);
         setControllerLoading(false);
@@ -59,7 +60,7 @@ export default function HomeScreen() {
 
       const diff = Date.now() - controllerLastSeen.getTime();
 
-      setControllerOnline(diff < 20000);
+      setControllerOnline(diff < 20500);
 
       setLastSeen(controllerLastSeen);
 
@@ -79,7 +80,7 @@ export default function HomeScreen() {
 
       const diff = Date.now() - lastSeen.getTime();
 
-      setControllerOnline(diff < 20000);
+      setControllerOnline(diff < 20500);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -123,7 +124,11 @@ export default function HomeScreen() {
 
           <View style={styles.overlayContent}>
             <View>
-              <Text style={styles.controllerTitle}>Main Controller</Text>
+              <Text style={styles.controllerTitle}>
+                {controllerOnline
+                  ? controllerData?.name || "Main Controller"
+                  : "Smart Switch"}
+              </Text>
 
               <Text style={styles.subtitle}>Your Smart Home is</Text>
 
@@ -304,12 +309,12 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingTop: 14,
+    paddingTop: 10,
   },
 
   heading: {
     fontSize: 28,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.primary,
   },
@@ -317,7 +322,7 @@ const styles = StyleSheet.create({
   subheading: {
     fontSize: 16,
     fontWeight: "100",
-
+    fontFamily: FONTS.semiBold,
     color: COLORS.grey,
 
     //marginBottom: SPACING.md,
@@ -336,7 +341,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
 
-    //marginTop: SPACING.md,
+    marginTop: 6,
 
     borderRadius: 10,
 
@@ -366,7 +371,7 @@ const styles = StyleSheet.create({
   dateNumber: {
     fontSize: 24,
 
-    fontWeight: "800",
+    fontFamily: FONTS.headingExtra,
 
     color: COLORS.primary,
 
@@ -376,7 +381,7 @@ const styles = StyleSheet.create({
   dateMonth: {
     fontSize: 13,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
 
@@ -413,8 +418,8 @@ const styles = StyleSheet.create({
   },
 
   controllerTitle: {
-    fontSize: 23,
-    fontWeight: "800",
+    fontSize: 20,
+    fontFamily: FONTS.headingExtra,
 
     color: COLORS.navy,
 
@@ -423,7 +428,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 15,
-
+    fontFamily: FONTS.medium,
     color: COLORS.grey,
   },
 
@@ -433,7 +438,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 28,
 
-    backgroundColor: "#d8d8d8a6",
+    backgroundColor: "#e0e0e0a6",
 
     borderRadius: 999,
 
@@ -456,8 +461,8 @@ const styles = StyleSheet.create({
 
   onlineText: {
     fontSize: 16,
-    fontWeight: "600",
-
+    fontFamily: FONTS.semiBold,
+    paddingBottom: 2,
     color: COLORS.navy,
   },
 
@@ -497,15 +502,15 @@ const styles = StyleSheet.create({
 
   statNumber: {
     fontSize: 26,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.primary,
   },
 
   statLabel: {
     fontSize: 12,
-    fontWeight: "600",
-
+    fontFamily: FONTS.semiBold,
+    paddingBottom: 4,
     color: COLORS.navy,
   },
 
@@ -518,7 +523,7 @@ const styles = StyleSheet.create({
 
   devicesTitle: {
     fontSize: 28,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
   },
@@ -526,7 +531,7 @@ const styles = StyleSheet.create({
   deviceSubheading: {
     fontSize: 16,
     fontWeight: "100",
-
+    fontFamily: FONTS.semiBold,
     color: COLORS.grey,
 
     marginBottom: SPACING.md,
@@ -542,6 +547,7 @@ const styles = StyleSheet.create({
   addButton: {
     width: 44,
     height: 44,
+    marginTop: 6,
 
     borderRadius: 999,
 
@@ -601,6 +607,7 @@ const styles = StyleSheet.create({
 
   offlineText: {
     color: COLORS.inactive,
+    paddingBottom: 2,
   },
 
   emptyStateContainer: {
@@ -616,7 +623,7 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -627,7 +634,7 @@ const styles = StyleSheet.create({
 
   emptyStateText: {
     fontSize: 15,
-
+    fontFamily: FONTS.regular,
     textAlign: "center",
 
     color: COLORS.grey,
@@ -639,7 +646,7 @@ const styles = StyleSheet.create({
 
   emptyStateButton: {
     flexDirection: "row",
-
+    fontFamily: FONTS.semiBold,
     alignItems: "center",
 
     gap: 8,
@@ -656,7 +663,7 @@ const styles = StyleSheet.create({
   emptyStateButtonText: {
     color: "#FFFFFF",
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     fontSize: 15,
   },
@@ -687,7 +694,7 @@ const styles = StyleSheet.create({
   loadingBadgeText: {
     fontSize: 16,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.inactive,
 

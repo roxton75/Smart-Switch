@@ -1,3 +1,4 @@
+import { FONTS } from "@/constants/fonts";
 import { COLORS, RADIUS } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -7,6 +8,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
@@ -22,6 +24,8 @@ type SmartModalProps = {
   onConfirm?: () => void;
 
   onCancel?: () => void;
+
+  onClose?: () => void;
 };
 
 export default function SmartModal({
@@ -33,6 +37,7 @@ export default function SmartModal({
   cancelText = "Cancel",
   onConfirm,
   onCancel,
+  onClose,
 }: SmartModalProps) {
   return (
     <Modal
@@ -42,15 +47,20 @@ export default function SmartModal({
       statusBarTranslucent
     >
       <View style={styles.overlay}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (type === "error") {
+              onClose?.();
+            }
+          }}
+        >
+          <View style={StyleSheet.absoluteFillObject} />
+        </TouchableWithoutFeedback>
         <View style={styles.modalCard}>
           {type === "loading" && (
             <>
               <View style={styles.iconContainer}>
-                <Ionicons
-                  name="wifi-outline"
-                  size={34}
-                  color={COLORS.primary}
-                />
+                <Ionicons name="wifi-outline" size={34} color={COLORS.card} />
               </View>
               <Text style={styles.title}>{title}</Text>
               <Text style={styles.message}>{message}</Text>
@@ -64,21 +74,29 @@ export default function SmartModal({
           )}
 
           {type === "success" && (
-            <View>
+            <View style={styles.content}>
               <View style={styles.successIcon}>
                 <Ionicons name="checkmark" size={34} color="#FFFFFF" />
               </View>
+
               <Text style={styles.title}>{title}</Text>
+
               <Text style={styles.message}>{message}</Text>
             </View>
           )}
 
           {type === "error" && (
-            <View>
+            <View style={styles.content}>
               <View style={styles.errorIcon}>
-                <Ionicons name="close" size={34} color="#FFFFFF" />
+                <Ionicons
+                  name="cloud-offline-outline"
+                  size={34}
+                  color="#FFFFFF"
+                />
               </View>
+
               <Text style={styles.title}>{title}</Text>
+
               <Text style={styles.message}>{message}</Text>
             </View>
           )}
@@ -147,6 +165,38 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  content: {
+    width: "100%",
+
+    alignItems: "center",
+
+    justifyContent: "center",
+  },
+
+  okButton: {
+    marginTop: 24,
+    fontFamily: FONTS.semiBold,
+    width: "100%",
+
+    height: 52,
+
+    borderRadius: 14,
+
+    backgroundColor: COLORS.primary,
+
+    justifyContent: "center",
+
+    alignItems: "center",
+  },
+
+  okButtonText: {
+    color: "#FFFFFF",
+
+    fontSize: 15,
+
+    fontFamily: FONTS.bold,
+  },
+
   iconContainer: {
     width: 72,
     height: 72,
@@ -155,7 +205,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.buttonBorder,
 
-    backgroundColor: "#EDF6DE",
+    backgroundColor: COLORS.primary,
 
     justifyContent: "center",
     alignItems: "center",
@@ -170,37 +220,39 @@ const styles = StyleSheet.create({
   successIcon: {
     width: 72,
     height: 72,
-
     borderRadius: 999,
-    borderWidth: 1.5,
+
+    borderWidth: 2,
     borderColor: COLORS.buttonBorder,
+
     backgroundColor: COLORS.primary,
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   errorIcon: {
     width: 72,
     height: 72,
-
     borderRadius: 999,
+
     borderWidth: 2,
     borderColor: COLORS.buttonBorder,
+
     backgroundColor: COLORS.primary,
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   title: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -211,7 +263,7 @@ const styles = StyleSheet.create({
 
   message: {
     fontSize: 15,
-
+    fontFamily: FONTS.medium,
     color: COLORS.grey,
 
     textAlign: "center",
@@ -222,16 +274,17 @@ const styles = StyleSheet.create({
   confirmIcon: {
     width: 72,
     height: 72,
-
     borderRadius: 999,
+
     borderWidth: 2,
     borderColor: COLORS.buttonBorder,
+
     backgroundColor: COLORS.primary,
 
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
 
-    marginBottom: 18,
+    marginBottom: 16,
   },
 
   buttonRow: {
@@ -248,7 +301,7 @@ const styles = StyleSheet.create({
     flex: 1,
 
     height: 52,
-
+    fontFamily: FONTS.semiBold,
     borderWidth: 1.5,
     borderRadius: 14,
     borderColor: COLORS.lightBorder,
@@ -260,7 +313,7 @@ const styles = StyleSheet.create({
 
   confirmButton: {
     flex: 1,
-
+    fontFamily: FONTS.semiBold,
     height: 52,
 
     borderWidth: 1.5,
@@ -275,13 +328,13 @@ const styles = StyleSheet.create({
   },
 
   cancelText: {
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
 
   confirmText: {
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: "#FFFFFF",
   },

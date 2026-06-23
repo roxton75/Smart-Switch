@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 
+import { FONTS } from "@/constants/fonts";
 import { subscribeToController } from "@/services/controllerService";
 import { subscribeToDevices } from "@/services/relayService";
 import { Device } from "@/types/device";
@@ -61,7 +62,7 @@ export default function DevicesContent() {
 
         const diff = Date.now() - controllerLastSeen.getTime();
 
-        setControllerOnline(diff < 20000);
+        setControllerOnline(diff < 20500);
 
         setLastSeen(controllerLastSeen);
 
@@ -87,7 +88,7 @@ export default function DevicesContent() {
       // } else {
       //   setControllerOnline(true);
       // }
-      setControllerOnline(diff < 20000);
+      setControllerOnline(diff < 20500);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -138,18 +139,6 @@ export default function DevicesContent() {
 
           <View style={styles.statDivider} />
 
-          {/* <View style={styles.statItem}>
-            <Text
-              style={[
-                styles.connectedText,
-                !controllerOnline && styles.offlineStat,
-              ]}
-            >
-              {controllerOnline ? "Connected" : "Offline"}
-            </Text>
-
-            <Text style={styles.statLabel}>WiFi</Text>
-          </View> */}
           <View style={styles.statItem}>
             <View style={styles.wifiStatusContainer}>
               <Text
@@ -289,7 +278,7 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingTop: 14,
+    paddingTop: 10,
   },
 
   sectionHeader: {
@@ -303,7 +292,7 @@ const styles = StyleSheet.create({
   addButton: {
     width: 42,
     height: 42,
-
+    marginTop: 6,
     borderRadius: 999,
     borderWidth: 1.5,
     borderColor: "#DCDCDC",
@@ -320,12 +309,13 @@ const styles = StyleSheet.create({
 
   heading: {
     fontSize: 28,
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.primary,
   },
 
   subheading: {
+    fontFamily: FONTS.semiBold,
     fontSize: 16,
     fontWeight: "100",
     color: COLORS.grey,
@@ -363,7 +353,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.primary,
   },
@@ -371,7 +361,7 @@ const styles = StyleSheet.create({
   connectedText: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.primary,
   },
@@ -379,7 +369,7 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 13,
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
   },
@@ -398,7 +388,7 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
 
     color: COLORS.navy,
 
@@ -442,7 +432,7 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 22,
 
-    fontWeight: "800",
+    fontFamily: FONTS.heading,
 
     color: COLORS.navy,
 
@@ -453,6 +443,8 @@ const styles = StyleSheet.create({
 
   emptyStateText: {
     fontSize: 15,
+
+    fontFamily: FONTS.regular,
 
     color: COLORS.grey,
 
@@ -465,7 +457,7 @@ const styles = StyleSheet.create({
 
   emptyStateButton: {
     flexDirection: "row",
-
+    fontFamily: FONTS.semiBold,
     alignItems: "center",
 
     gap: 8,
@@ -482,7 +474,7 @@ const styles = StyleSheet.create({
   emptyStateButtonText: {
     color: "#FFF",
 
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
   },
 
   wifiStatusContainer: {

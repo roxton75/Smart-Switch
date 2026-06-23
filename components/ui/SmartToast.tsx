@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
+import { FONTS } from "@/constants/fonts";
 import { COLORS } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -106,18 +107,8 @@ const styles = StyleSheet.create({
 
     borderRadius: 18,
 
-    shadowColor: "#000",
-
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    shadowOpacity: 0.2,
-
-    shadowRadius: 6,
-
-    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: COLORS.lightBorder,
   },
 
   icon: {
@@ -139,7 +130,7 @@ const styles = StyleSheet.create({
 
   title: {
     color: COLORS.navy,
-    fontWeight: "700",
+    fontFamily: FONTS.bold,
     fontSize: 15,
   },
 
