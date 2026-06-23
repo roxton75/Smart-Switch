@@ -26,14 +26,16 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/logo.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#eeeeee"
+          "backgroundColor": "#eeeeee",
+          "image": "./assets/images/logo.png",
+          "imageWidth": 420
         }
       ],
       "expo-font"
