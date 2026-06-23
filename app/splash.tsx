@@ -14,6 +14,16 @@ export default function SplashScreen() {
   const screenOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    const navigationTimer = setTimeout(() => {
+      Animated.timing(screenOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }).start(() => {
+        router.replace("/(tabs)");
+      });
+    }, 2500);
+
     Animated.sequence([
       Animated.parallel([
         Animated.timing(logoOpacity, {
@@ -55,11 +65,9 @@ export default function SplashScreen() {
         duration: 800,
         useNativeDriver: true,
       }),
-    ]).start(() => {
-      setTimeout(() => {
-        router.replace("/(tabs)");
-      }, 1500);
-    });
+    ]).start();
+
+    return () => clearTimeout(navigationTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

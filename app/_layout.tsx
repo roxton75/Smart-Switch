@@ -27,9 +27,14 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    // console.log("Custom Splash Mounted");
+    async function prepare() {
+      if (loaded) {
+        await SplashScreen.hideAsync();
+      }
     }
+
+    prepare();
   }, [loaded]);
 
   if (!loaded) {
@@ -42,7 +47,7 @@ export default function RootLayout() {
       >
         <StatusBar style="dark" backgroundColor={COLORS.background} />
 
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="splash" />
           <Stack.Screen name="(tabs)" />
         </Stack>
