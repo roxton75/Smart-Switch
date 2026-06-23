@@ -4,7 +4,7 @@
     "slug": "smart-switch",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon-app.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "smartswitch",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -21,7 +21,8 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "usesCleartextTraffic": true,
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "package": "com.rudrx75.smartswitch"
     },
     "web": {
       "output": "static",
@@ -40,6 +41,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f79a3073-97ed-48fe-8c31-8522f64e9a08"
+      }
     }
   }
 }
