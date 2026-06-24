@@ -4,7 +4,7 @@
     "slug": "smart-switch",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon-app.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "smartswitch",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -13,7 +13,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#eeeeee",
-        "foregroundImage": "./assets/images/icon-app.png"
+        "foregroundImage": "./assets/images/app-icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",

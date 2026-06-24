@@ -1,15 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+    BottomSheetScrollView,
+    BottomSheetView,
+    BottomSheetTextInput,
+} from "@gorhom/bottom-sheet";
 
 import {
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Keyboard,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -149,7 +152,8 @@ export default function EditChannelSheet({
       enablePanDownToClose
       enableContentPanningGesture={false}
       enableHandlePanningGesture={true}
-      keyboardBehavior="interactive"
+      enableDynamicSizing={false}
+      keyboardBehavior="fillParent"
       keyboardBlurBehavior="restore"
       onClose={onClose}
       backgroundStyle={{
@@ -170,7 +174,10 @@ export default function EditChannelSheet({
         backgroundColor: "#88B04B",
       }}
     >
-      <BottomSheetView style={styles.container}>
+      <BottomSheetScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Header */}
 
         <View style={styles.header}>
@@ -208,7 +215,7 @@ export default function EditChannelSheet({
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>Device Name</Text>
 
-              <TextInput
+              <BottomSheetTextInput
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter Device Name"
@@ -230,7 +237,7 @@ export default function EditChannelSheet({
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>Location</Text>
 
-              <TextInput
+              <BottomSheetTextInput
                 value={location}
                 onChangeText={setLocation}
                 placeholder="Enter Device Location"
@@ -350,7 +357,7 @@ export default function EditChannelSheet({
               : "Device configured successfully."
           }
         />
-      </BottomSheetView>
+      </BottomSheetScrollView>
     </BottomSheet>
   );
 }
