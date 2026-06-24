@@ -3,7 +3,6 @@ import { COLORS } from "@/constants/theme";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import useInternetStatus from "hooks/useInternetStatus";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
@@ -11,7 +10,8 @@ import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  useInternetStatus();
+  console.log("RootLayout Started");
+  // useInternetStatus();
   const [loaded] = useFonts({
     "PlusJakarta-Bold": require("@/assets/fonts/PlusJakartaSans-Bold.ttf"),
 
@@ -26,20 +26,23 @@ export default function RootLayout() {
     "Manrope-Bold": require("@/assets/fonts/Manrope-Bold.ttf"),
   });
 
-  useEffect(() => {
-    // console.log("Custom Splash Mounted");
-    async function prepare() {
-      if (loaded) {
-        await SplashScreen.hideAsync();
-      }
-    }
+  // useEffect(() => {
+  //   // console.log("Custom Splash Mounted");
+  //   async function prepare() {
+  //     if (loaded) {
+  //       await SplashScreen.hideAsync();
+  //     }
+  //   }
 
-    prepare();
+  //   prepare();
+  // }, [loaded]);
+  useEffect(() => {
+    if (loaded) {
+      console.log("Fonts Loaded");
+      SplashScreen.hideAsync();
+    }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
   return (
     <>
       <GestureHandlerRootView

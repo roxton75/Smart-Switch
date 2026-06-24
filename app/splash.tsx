@@ -71,6 +71,10 @@ export default function SplashScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    console.log("Custom Splash Mounted");
+  }, []);
+
   return (
     <Animated.View
       style={[
