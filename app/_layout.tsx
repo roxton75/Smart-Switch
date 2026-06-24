@@ -10,7 +10,7 @@ import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  console.log("RootLayout Started");
+  // console.log("RootLayout Started");
   // useInternetStatus();
   const [loaded] = useFonts({
     "PlusJakarta-Bold": require("@/assets/fonts/PlusJakartaSans-Bold.ttf"),
@@ -26,19 +26,9 @@ export default function RootLayout() {
     "Manrope-Bold": require("@/assets/fonts/Manrope-Bold.ttf"),
   });
 
-  // useEffect(() => {
-  //   // console.log("Custom Splash Mounted");
-  //   async function prepare() {
-  //     if (loaded) {
-  //       await SplashScreen.hideAsync();
-  //     }
-  //   }
-
-  //   prepare();
-  // }, [loaded]);
   useEffect(() => {
     if (loaded) {
-      console.log("Fonts Loaded");
+      // console.log("Fonts Loaded");
       SplashScreen.hideAsync();
     }
   }, [loaded]);

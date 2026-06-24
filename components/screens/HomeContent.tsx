@@ -218,9 +218,9 @@ export default function HomeScreen() {
 
           <Pressable
             style={styles.addButton}
-            onPress={() => router.push("/setup")}
+            onPress={() => router.push("/devices")}
           >
-            <Ionicons name="add" size={28} color="#FFFFFF" />
+            <Ionicons name="arrow-forward-outline" size={28} color="#FFFFFF" />
           </Pressable>
         </View>
 
@@ -263,9 +263,13 @@ export default function HomeScreen() {
 
             <Pressable
               style={styles.emptyStateButton}
-              onPress={() => router.push("/setup")}
+              onPress={() => router.push("/devices")}
             >
-              <Ionicons name="add" size={18} color="#FFFFFF" />
+              <Ionicons
+                name="arrow-forward-outline"
+                size={28}
+                color="#FFFFFF"
+              />
 
               <Text style={styles.emptyStateButtonText}>Add First Device</Text>
             </Pressable>

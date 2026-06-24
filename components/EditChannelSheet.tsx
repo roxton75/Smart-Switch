@@ -1,18 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import BottomSheet, {
-    BottomSheetScrollView,
-    BottomSheetView,
-    BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
 import {
-    Keyboard,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  BackHandler,
+  View,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -43,7 +41,7 @@ export default function EditChannelSheet({
 }: Props) {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => [450], []);
+  const snapPoints = useMemo(() => [540, 595], []);
 
   const [name, setName] = useState("");
 
@@ -104,7 +102,7 @@ export default function EditChannelSheet({
         setShowSuccess(false);
         onClose();
       }, 1500);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // console.log(error);
 
@@ -138,10 +136,43 @@ export default function EditChannelSheet({
 
   useEffect(() => {
     if (visible) {
-      bottomSheetRef.current?.expand();
+      bottomSheetRef.current?.snapToIndex(0); // 540
     } else {
       bottomSheetRef.current?.close();
     }
+  }, [visible]);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => {
+      bottomSheetRef.current?.snapToIndex(1);
+    });
+
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      bottomSheetRef.current?.snapToIndex(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (visible) {
+        onClose();
+        return true; // prevent default back action
+      }
+
+      return false; // allow normal navigation
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction,
+    );
+
+    return () => subscription.remove();
   }, [visible]);
 
   return (
@@ -153,8 +184,7 @@ export default function EditChannelSheet({
       enableContentPanningGesture={false}
       enableHandlePanningGesture={true}
       enableDynamicSizing={false}
-      keyboardBehavior="fillParent"
-      keyboardBlurBehavior="restore"
+      android_keyboardInputMode="adjustPan"
       onClose={onClose}
       backgroundStyle={{
         backgroundColor: "#fcfcfc",
@@ -174,10 +204,7 @@ export default function EditChannelSheet({
         backgroundColor: "#88B04B",
       }}
     >
-      <BottomSheetScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
+      <BottomSheetView style={styles.container}>
         {/* Header */}
 
         <View style={styles.header}>
@@ -215,7 +242,7 @@ export default function EditChannelSheet({
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>Device Name</Text>
 
-              <BottomSheetTextInput
+              <TextInput
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter Device Name"
@@ -237,7 +264,7 @@ export default function EditChannelSheet({
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>Location</Text>
 
-              <BottomSheetTextInput
+              <TextInput
                 value={location}
                 onChangeText={setLocation}
                 placeholder="Enter Device Location"
@@ -357,7 +384,7 @@ export default function EditChannelSheet({
               : "Device configured successfully."
           }
         />
-      </BottomSheetScrollView>
+      </BottomSheetView>
     </BottomSheet>
   );
 }

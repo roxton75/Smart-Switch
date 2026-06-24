@@ -71,9 +71,9 @@ export default function SplashScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log("Custom Splash Mounted");
-  }, []);
+  // useEffect(() => {
+  //   console.log("Custom Splash Mounted");
+  // }, []);
 
   return (
     <Animated.View
@@ -145,17 +145,17 @@ const styles = StyleSheet.create({
   },
 
   developedBy: {
-    fontSize: 14,
+    fontSize: 12,
 
     fontFamily: FONTS.semiBold,
 
     color: "#b6b6b6",
-    paddingLeft: 23,
+    marginLeft: 23,
     marginTop: 12,
   },
 
   devnoxLogo: {
-    width: 150,
-    height: 70,
+    width: 130,
+    height: 60,
   },
 });

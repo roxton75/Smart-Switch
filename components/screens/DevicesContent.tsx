@@ -112,7 +112,11 @@ export default function DevicesContent() {
             style={styles.addButton}
             onPress={() => router.push("/setup")}
           >
-            <Ionicons name="add" size={28} color={COLORS.primary} />
+            <Ionicons
+              name="settings-outline"
+              size={26}
+              color={COLORS.primary}
+            />
           </Pressable>
         </View>
 
@@ -225,7 +229,11 @@ export default function DevicesContent() {
               style={styles.emptyStateButton}
               onPress={() => router.push("/setup")}
             >
-              <Ionicons name="add" size={18} color="#FFF" />
+              <Ionicons
+                name="settings-outline"
+                size={26}
+                color={COLORS.primary}
+              />
 
               <Text style={styles.emptyStateButtonText}>Add Device</Text>
             </Pressable>
