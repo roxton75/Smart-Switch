@@ -1,51 +1,181 @@
-# Welcome to your Expo app 👋
+# 💡 Smart Switch
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern IoT-based Smart Home Automation system that allows users to remotely control home appliances through a mobile application. The project consists of a React Native (Expo) mobile app, an ESP32-based controller, and Firebase Realtime Database for real-time communication.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Features
 
-   ```bash
-   npm install
-   ```
+- 🔌 Control up to 8 electrical appliances remotely
+- 📶 Wi-Fi based ESP32 controller
+- ⚡ Real-time device state synchronization
+- 🏠 Configure controller and home Wi-Fi directly from the app
+- 📍 Assign custom device names and locations
+- 💡 Device type selection (Light, Fan, Socket)
+- 📊 Live controller status monitoring
+- 🌐 Internet connectivity detection
+- 🔄 Automatic controller heartbeat
+- 🔐 Firebase Realtime Database integration
+- 📱 Modern Material-inspired UI
+- 🎨 Custom animated splash screen
+- ⚙️ Factory reset support
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🛠️ Tech Stack
 
-In the output, you'll find options to open the app in a
+### Mobile App
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- Firebase Realtime Database
+- React Native Reanimated
+- @gorhom/bottom-sheet
+- React Native Gesture Handler
+- React Native Toast Message
+- NetInfo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Hardware
 
-## Get a fresh project
+- ESP32
+- 8 Channel Relay Module
 
-When you're ready, run:
+### Backend
 
-```bash
-npm run reset-project
+- Firebase Realtime Database
+
+---
+
+## 📂 Project Structure
+
+```
+smart-switch/
+│
+├── app/
+├── components/
+├── constants/
+├── hooks/
+├── services/
+├── assets/
+├── extra/
+│   └── ESP32 Firmware Code
+├── app.json
+├── eas.json
+└── README.md
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🚀 Getting Started
 
-To learn more about developing your project with Expo, look at the following resources:
+### Clone the repository
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+git clone https://github.com/roxton75/Smart-Switch-.git
 
-## Join the community
+cd Smart-Switch-
+```
 
-Join our community of developers creating universal apps.
+### Install dependencies
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# Smart-Switch
+```bash
+npm install
+```
+
+### Configure Environment Variables
+
+Create a `.env` file.
+
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_DATABASE_URL=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+```
+
+---
+
+## ▶️ Run the Project
+
+```bash
+npx expo start
+```
+
+Android
+
+```bash
+npx expo run:android
+```
+
+---
+
+## 📦 Build APK
+
+Development Build
+
+```bash
+eas build --platform android --profile development
+```
+
+Production Build
+
+```bash
+eas build --platform android --profile production
+```
+
+---
+
+## 🔧 ESP32 Firmware
+
+The firmware provides:
+
+- Wi-Fi provisioning
+- Local HTTP server
+- Controller registration
+- Relay state synchronization
+- Heartbeat updates
+- Factory Reset
+- Preferences storage
+- Automatic reconnection
+
+---
+
+## 🔐 Security
+
+Firebase credentials are managed using Expo Environment Variables.
+Sensitive configuration files are excluded from version control.
+
+---
+
+## 📌 Future Improvements
+
+- OTA Firmware Updates
+- Multiple Controller Support
+- Room Management
+- User Authentication
+- Device Sharing
+- Scheduling & Automation
+- Energy Consumption Monitoring
+- Voice Assistant Integration
+- MQTT Support
+
+---
+
+## 👨‍💻 Author
+
+**Rudraksh Ramekar**
+
+React Native Developer • Product Design and UX Enthusiast
+
+GitHub: https://github.com/roxton75
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
