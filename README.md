@@ -4,6 +4,12 @@ A modern IoT-based Smart Home Automation system that allows users to remotely co
 
 <img width="1136" height="724" alt="Banner" src="https://github.com/user-attachments/assets/de5e1c8f-4821-4846-ade8-a8d02fdab9c1" />
 
+<p align="center">
+
+![React Native](https://img.shields.io/badge/React_Native-0.81-blue) ![Expo](https://img.shields.io/badge/Expo-SDK_54-black) ![Firebase](https://img.shields.io/badge/Firebase-Realtime-orange) ![ESP32](https://img.shields.io/badge/ESP32-IoT-green) ![License](https://img.shields.io/badge/License-MIT-blue)
+
+</p>
+
 ---
 
 ## 📱 Features
