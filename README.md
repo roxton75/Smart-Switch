@@ -2,6 +2,8 @@
 
 A modern IoT-based Smart Home Automation system that allows users to remotely control home appliances through a mobile application. The project consists of a React Native (Expo) mobile app, an ESP32-based controller, and Firebase Realtime Database for real-time communication.
 
+<img width="1136" height="724" alt="Banner" src="https://github.com/user-attachments/assets/de5e1c8f-4821-4846-ade8-a8d02fdab9c1" />
+
 ---
 
 ## 📱 Features
@@ -59,6 +61,7 @@ smart-switch/
 ├── hooks/
 ├── services/
 ├── assets/
+├── types/
 ├── extra/
 │   └── ESP32 Firmware Code
 ├── app.json
@@ -75,7 +78,7 @@ smart-switch/
 ```bash
 git clone https://github.com/roxton75/Smart-Switch-.git
 
-cd Smart-Switch-
+cd Smart-Switch
 ```
 
 ### Install dependencies
